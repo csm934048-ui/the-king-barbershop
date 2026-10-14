@@ -135,6 +135,21 @@ input:focus,select:focus,textarea:focus{border-color:var(--gold);outline:none}
 .day:hover{border-color:var(--gold-lo)}
 .day[aria-checked="true"]{border-color:var(--gold);background:var(--gold);color:#14100a}
 .day[aria-checked="true"] b{color:#14100a}
+.slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(82px,1fr));gap:8px}
+.slot{display:grid;gap:3px;justify-items:center;padding:10px 6px;background:var(--bg);border:1px solid var(--line);color:var(--fg);cursor:pointer;border-radius:2px;font-variant-numeric:tabular-nums}
+.slot span{font:600 1.1rem/1 var(--label)}
+.slot small{font:500 .68rem/1 var(--label);letter-spacing:.14em;text-transform:uppercase;color:var(--ok)}
+.slot:hover:not(:disabled){border-color:var(--gold-lo)}
+.slot[aria-checked="true"]{background:var(--gold);border-color:var(--gold);color:#14100a}
+.slot[aria-checked="true"] small{color:#14100a}
+.slot:disabled{cursor:not-allowed;opacity:.5}
+.slot:disabled span{text-decoration:line-through}
+.slot:disabled small{color:var(--off)}
+.slots-msg{grid-column:1/-1;margin:0;color:var(--muted);font-size:.9rem}
+.okbox{background:var(--panel);border:1px solid var(--gold);padding:clamp(20px,3vw,32px);display:grid;gap:14px;align-content:start}
+.okbox h3{font:700 1.6rem/1.2 var(--display);margin:0}
+.okbox p{margin:0;color:var(--fg)}
+form .btn,.okbox .btn{min-height:54px;grid-column:1/-1}
 .err{color:var(--off);font-size:.9rem;min-height:1.2em;margin:0}
 .preview{grid-column:1/-1;font-size:.92rem;color:var(--muted);border-left:2px solid var(--gold-lo);padding-left:12px;white-space:pre-line;margin:0}
 form .btn{grid-column:1/-1;min-height:54px}
@@ -258,26 +273,30 @@ footer a{color:var(--gold-hi)}
     <div class="wrap book">
       <div class="book-copy">
         <div class="eyebrow">Turnos</div>
-        <h2>Pedí tu turno por WhatsApp</h2>
-        <p>Completá los datos y se abre WhatsApp con el mensaje listo. Los turnos son cada 45 minutos y te confirmamos el horario por ahí.</p>
+        <h2>Reservá tu turno</h2>
+        <p>Elegí el servicio, el día y un horario libre. Los horarios ocupados aparecen tachados. Turnos cada 45 minutos.</p>
         <ol>
-          <li><span>Elegí servicio, día y horario.</span></li>
-          <li><span>Tocá <b>Enviar por WhatsApp</b> y mandá el mensaje.</span></li>
-          <li><span>Esperá la confirmación. Si no llegás, avisanos.</span></li>
+          <li><span>Elegí servicio, día y un horario libre.</span></li>
+          <li><span>Tocá <b>Reservar turno</b>: el horario queda guardado a tu nombre.</span></li>
+          <li><span>Mandanos el aviso por WhatsApp. Si no podés venir, avisanos.</span></li>
         </ol>
       </div>
       <form id="bookForm" novalidate>
-        <div class="f full">
+        <div class="f">
           <label for="nombre">Tu nombre</label>
-          <input id="nombre" name="nombre" autocomplete="given-name" placeholder="Ej: Juan">
+          <input id="nombre" name="nombre" autocomplete="given-name" placeholder="Ej: Juan" maxlength="60">
+        </div>
+        <div class="f">
+          <label for="tel">Tu WhatsApp</label>
+          <input id="tel" name="tel" type="tel" inputmode="tel" autocomplete="tel" placeholder="Ej: 351 123 4567" maxlength="25">
         </div>
         <div class="f full">
           <span class="legend" id="servLbl">Servicio</span>
           <div class="svcs" role="radiogroup" aria-labelledby="servLbl">
-            <input type="radio" name="servicio" id="s1" value="Corte ($13.000)" checked><label for="s1"><b>Corte <em>$13.000</em></b><span>Degradé, texturizado o clásico. Lavado y peinado al final.</span></label>
-            <input type="radio" name="servicio" id="s2" value="Corte + barba ($17.000)"><label for="s2"><b>Corte + barba <em>$17.000</em></b><span>Corte completo y barba perfilada a navaja, con toalla caliente.</span></label>
-            <input type="radio" name="servicio" id="s3" value="Color ($50.000)"><label for="s3"><b>Color <em>$50.000</em></b><span>Platinado, decoloración o color de fantasía. Traé una foto de referencia.</span></label>
-            <input type="radio" name="servicio" id="s4" value="Otro (lo charlamos)"><label for="s4"><b>Otro <em>Consultá</em></b><span>Diseño, cejas o lo que tengas en mente. Contanos en el comentario.</span></label>
+            <input type="radio" name="servicio" id="s1" value="corte" checked><label for="s1"><b>Corte <em>$13.000</em></b><span>Degradé, texturizado o clásico. Lavado y peinado al final.</span></label>
+            <input type="radio" name="servicio" id="s2" value="corte-barba"><label for="s2"><b>Corte + barba <em>$17.000</em></b><span>Corte completo y barba perfilada a navaja, con toalla caliente.</span></label>
+            <input type="radio" name="servicio" id="s3" value="color"><label for="s3"><b>Color <em>$50.000</em></b><span>Platinado, decoloración o color de fantasía. Traé una foto de referencia.</span></label>
+            <input type="radio" name="servicio" id="s4" value="otro"><label for="s4"><b>Otro <em>Consultá</em></b><span>Diseño, cejas o lo que tengas en mente. Contanos en el comentario.</span></label>
           </div>
         </div>
         <div class="f full">
@@ -286,20 +305,27 @@ footer a{color:var(--gold-hi)}
           <input type="hidden" id="dia" name="dia">
         </div>
         <div class="f full">
-          <label for="hora">Horario</label>
-          <select id="hora" name="hora"></select>
+          <span class="legend" id="horaLbl">Horario</span>
+          <div class="slots" id="slots" role="radiogroup" aria-labelledby="horaLbl"></div>
+          <input type="hidden" id="hora" name="hora">
         </div>
         <div class="f full">
           <label for="nota">Comentario (opcional)</label>
-          <textarea id="nota" name="nota" placeholder="Ej: degradé bajo, traigo foto de referencia"></textarea>
+          <textarea id="nota" name="nota" placeholder="Ej: degradé bajo, traigo foto de referencia" maxlength="300"></textarea>
         </div>
         <p class="err full" id="err" aria-live="polite"></p>
-        <p class="preview" id="preview"></p>
-        <a class="btn btn-gold" id="sendWa" href="https://wa.me/5493513542473" target="_blank" rel="noopener">
-          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.6.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.8 11.9 11.9 0 0 0 4.6 4c1.7.7 2.4.8 3.2.7a2.8 2.8 0 0 0 1.8-1.3 2.3 2.3 0 0 0 .2-1.3c-.1-.1-.3-.2-.5-.3Z"/></svg>
-          Enviar por WhatsApp
-        </a>
+        <button class="btn btn-gold" id="reservar" type="submit">Reservar turno</button>
       </form>
+      <div class="okbox" id="okBox" hidden>
+        <div class="eyebrow">Turno reservado</div>
+        <h3 id="okTitle">¡Listo!</h3>
+        <p id="okText"></p>
+        <a class="btn btn-gold" id="okWa" href="https://wa.me/5493513542473" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.6.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.8 11.9 11.9 0 0 0 4.6 4c1.7.7 2.4.8 3.2.7a2.8 2.8 0 0 0 1.8-1.3 2.3 2.3 0 0 0 .2-1.3c-.1-.1-.3-.2-.5-.3Z"/></svg>
+          Avisar por WhatsApp
+        </a>
+        <button class="btn btn-ghost" id="otro" type="button">Reservar otro turno</button>
+      </div>
     </div>
   </section>
 
@@ -378,15 +404,15 @@ footer a{color:var(--gold-hi)}
     function sel(){var r=document.createRange();r.selectNodeContents(document.getElementById("num"));var s=getSelection();s.removeAllRanges();s.addRange(r);}
   });
 
-  // Formulario de turno
+  // Formulario de turno (reservas guardadas en el servidor)
+  var SVC={"corte":"Corte ($13.000)","corte-barba":"Corte + barba ($17.000)","color":"Color ($50.000)","otro":"Otro (lo charlamos)"};
   var f=document.getElementById("bookForm"), dia=document.getElementById("dia"), hora=document.getElementById("hora"),
-      nombre=document.getElementById("nombre"), nota=document.getElementById("nota"),
-      err=document.getElementById("err"), prev=document.getElementById("preview"), send=document.getElementById("sendWa");
+      nombre=document.getElementById("nombre"), tel=document.getElementById("tel"), nota=document.getElementById("nota"),
+      err=document.getElementById("err"), slotsBox=document.getElementById("slots"), btn=document.getElementById("reservar"),
+      okBox=document.getElementById("okBox");
   function pad(x){return (x<10?"0":"")+x}
   function iso(y,m,d){return y+"-"+pad(m)+"-"+pad(d)}
   var today = iso(n.y,n.m,n.d);
-  dia.min = today;
-  // primer día hábil disponible
   var start = new Date(Date.UTC(n.y,n.m-1,n.d));
   var LAST = OPEN*60 + Math.floor((CLOSE*60-SLOT-OPEN*60)/SLOT)*SLOT;
   if (n.wd===0 || (workday && mins+15>=LAST)) { do { start.setUTCDate(start.getUTCDate()+1); } while(start.getUTCDay()===0); }
@@ -405,53 +431,87 @@ footer a{color:var(--gold-hi)}
   function markDay(){ [].forEach.call(daysBox.children,function(b){ var on=b.dataset.v===dia.value; b.setAttribute("aria-checked",on); b.tabIndex=on?0:-1; }); }
   daysBox.addEventListener("click",function(e){
     var b=e.target.closest(".day"); if(!b) return;
-    dia.value=b.dataset.v; markDay(); fillHours(); update();
+    dia.value=b.dataset.v; hora.value=""; markDay(); loadSlots();
   });
   markDay();
 
-  function fillHours(){
-    var keep=hora.value; hora.innerHTML="";
-    var isToday = dia.value===today;
-    // turnos cada 45 minutos: 10:00, 10:45, 11:30 ... el último termina a las 21:00
-    for (var t0=OPEN*60; t0+SLOT<=CLOSE*60; t0+=SLOT){
-      if (isToday && t0 <= mins+15) continue;
-      var t=pad(Math.floor(t0/60))+":"+pad(t0%60), o=document.createElement("option"); o.value=o.textContent=t; hora.appendChild(o);
-    }
-    if (!hora.options.length){var o=document.createElement("option");o.value="";o.textContent="Sin horarios hoy";hora.appendChild(o);}
-    if ([].some.call(hora.options,function(o){return o.value===keep})) hora.value=keep;
+  function allSlots(){ var out=[]; for (var t0=OPEN*60; t0+SLOT<=CLOSE*60; t0+=SLOT) out.push(t0); return out; }
+  function fmt(t0){ return pad(Math.floor(t0/60))+":"+pad(t0%60); }
+  var reqId=0;
+  function renderSlots(taken, failed){
+    slotsBox.innerHTML="";
+    var isToday=dia.value===today, free=0;
+    allSlots().forEach(function(t0){
+      if (isToday && t0<=mins+15) return;
+      var t=fmt(t0), busy=taken.indexOf(t)>-1;
+      var s=document.createElement("button"); s.type="button"; s.className="slot"; s.dataset.v=t; s.setAttribute("role","radio");
+      s.innerHTML="<span>"+t+"</span><small>"+(busy?"Ocupado":"Libre")+"</small>";
+      if (busy){ s.disabled=true; s.setAttribute("aria-label",t+", ocupado"); } else free++;
+      s.setAttribute("aria-checked", !busy && t===hora.value);
+      slotsBox.appendChild(s);
+    });
+    if (hora.value && (taken.indexOf(hora.value)>-1 || !slotsBox.querySelector('[data-v="'+hora.value+'"]'))) hora.value="";
+    if (!free){ var m=document.createElement("p"); m.className="slots-msg"; m.textContent="No quedan horarios libres este día. Probá con otro."; slotsBox.appendChild(m); }
+    if (failed){ var w=document.createElement("p"); w.className="slots-msg"; w.textContent="No pudimos ver qué horarios están ocupados. Recargá la página para verlo."; slotsBox.appendChild(w); }
   }
+  function loadSlots(){
+    var my=++reqId;
+    slotsBox.innerHTML='<p class="slots-msg">Cargando horarios…</p>';
+    fetch("/api/horarios?fecha="+dia.value,{cache:"no-store"})
+      .then(function(r){ if(!r.ok) throw 0; return r.json(); })
+      .then(function(d){ if(my===reqId) renderSlots(d.ocupados||[], false); })
+      .catch(function(){ if(my===reqId) renderSlots([], true); });
+  }
+  slotsBox.addEventListener("click",function(e){
+    var s=e.target.closest(".slot"); if(!s||s.disabled) return;
+    hora.value=s.dataset.v;
+    [].forEach.call(slotsBox.querySelectorAll(".slot"),function(x){ x.setAttribute("aria-checked", x===s); });
+    if (err.textContent) err.textContent=check();
+  });
+
   function dayName(v){ var p=v.split("-"); return DAYS[new Date(Date.UTC(+p[0],+p[1]-1,+p[2])).getUTCDay()]; }
+  function nice(v){ var p=v.split("-"); return dayName(v)+" "+p[2]+"/"+p[1]; }
   function check(){
     if (!nombre.value.trim()) return "Escribí tu nombre.";
+    var d=tel.value.replace(/\D/g,""); if (d.length<8||d.length>15) return "Escribí tu número de WhatsApp.";
     if (!dia.value) return "Elegí un día.";
-    if (dia.value < today) return "Elegí un día de hoy en adelante.";
-    if (dayName(dia.value)==="domingo") return "Los domingos está cerrado. Elegí de lunes a sábado.";
-    if (!hora.value) return "No quedan horarios para ese día. Probá con otro.";
+    if (!hora.value) return "Elegí un horario libre.";
     return "";
   }
-  function message(){
-    var s=f.querySelector('input[name="servicio"]:checked').value, p=dia.value.split("-");
-    var txt="Hola! Quiero sacar un turno en The King's Barbershop.\n"+
-      "Nombre: "+(nombre.value.trim()||"—")+"\n"+
-      "Servicio: "+s+"\n"+
-      "Día: "+(dia.value? dayName(dia.value)+" "+p[2]+"/"+p[1] : "—")+"\n"+
-      "Horario: "+(hora.value||"—");
-    if (nota.value.trim()) txt+="\nComentario: "+nota.value.trim();
-    return txt;
+  function focusFor(problem){
+    if (problem.indexOf("nombre")>-1) nombre.focus();
+    else if (problem.indexOf("WhatsApp")>-1) tel.focus();
+    else (slotsBox.querySelector(".slot:not([disabled])")||daysBox).focus();
   }
-  function update(){
-    var m=message(); prev.textContent=m;
-    send.href="https://wa.me/"+WA+"?text="+encodeURIComponent(m);
-    if (err.textContent) err.textContent=check();
-  }
-  f.addEventListener("input",update);
-  f.addEventListener("change",update);
-  f.addEventListener("submit",function(e){e.preventDefault()});
-  send.addEventListener("click",function(e){
+  f.addEventListener("input",function(){ if (err.textContent) err.textContent=check(); });
+  f.addEventListener("submit",function(e){
+    e.preventDefault();
     var problem=check();
-    if (problem){ e.preventDefault(); err.textContent=problem; (problem.indexOf("nombre")>-1?nombre:(problem.indexOf("horarios")>-1?hora:daysBox.querySelector(".day"))).focus(); }
+    if (problem){ err.textContent=problem; focusFor(problem); return; }
+    var svc=f.querySelector('input[name="servicio"]:checked').value;
+    var data={fecha:dia.value,hora:hora.value,nombre:nombre.value.trim(),telefono:tel.value.trim(),servicio:svc,nota:nota.value.trim()};
+    btn.disabled=true; btn.textContent="Reservando…"; err.textContent="";
+    fetch("/api/reservar",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(data)})
+      .then(function(r){ return r.json().catch(function(){return {};}).then(function(j){ return {status:r.status, j:j}; }); })
+      .then(function(res){
+        if (res.status===200){
+          var msg="Hola! Reservé un turno desde la web.\nNombre: "+data.nombre+"\nServicio: "+SVC[svc]+"\nDía: "+nice(data.fecha)+"\nHorario: "+data.hora;
+          if (data.nota) msg+="\nComentario: "+data.nota;
+          document.getElementById("okText").textContent=data.nombre+", tu turno quedó reservado para el "+nice(data.fecha)+" a las "+data.hora+" ("+SVC[svc]+"). Mandanos el aviso por WhatsApp para que lo tengamos a mano.";
+          document.getElementById("okWa").href="https://wa.me/"+WA+"?text="+encodeURIComponent(msg);
+          f.hidden=true; okBox.hidden=false; okBox.scrollIntoView({behavior:"smooth",block:"center"});
+        } else {
+          err.textContent=(res.j && res.j.error) || "No se pudo reservar. Probá de nuevo.";
+          if (res.status===409){ hora.value=""; loadSlots(); }
+        }
+      })
+      .catch(function(){ err.textContent="No hay conexión. Probá de nuevo o escribinos por WhatsApp al 351 354-2473."; })
+      .then(function(){ btn.disabled=false; btn.textContent="Reservar turno"; });
   });
-  fillHours(); update();
+  document.getElementById("otro").addEventListener("click",function(){
+    okBox.hidden=true; f.hidden=false; hora.value=""; nota.value=""; loadSlots(); f.scrollIntoView({behavior:"smooth",block:"start"});
+  });
+  loadSlots();
 })();
 </script>
 

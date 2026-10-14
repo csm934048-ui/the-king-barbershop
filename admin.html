@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>Agenda · The King's Barbershop</title>
+<link rel="icon" href="img/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@500;600&display=swap">
+<style>
+:root{--bg:#0d0c0a;--panel:#16140f;--line:#2c2719;--fg:#efe9dc;--muted:#a59d8b;--gold:#c9a45c;--gold-hi:#ecd29a;--gold-lo:#8a6a2f;--ok:#6fcf8e;--off:#d9826b;
+--display:"Cinzel",Georgia,serif;--body:"Barlow","Helvetica Neue",Arial,sans-serif;--label:"Barlow Condensed","Arial Narrow",Arial,sans-serif;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:400 1rem/1.5 var(--body);-webkit-font-smoothing:antialiased}
+.wrap{max-width:900px;margin-inline:auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+:focus-visible{outline:2px solid var(--gold-hi);outline-offset:2px}
+.eyebrow,label,.legend{font:600 .78rem/1 var(--label);letter-spacing:.18em;text-transform:uppercase;color:var(--gold)}
+h1{font:700 clamp(1.4rem,4vw,2rem)/1.15 var(--display);margin:0;letter-spacing:.04em}
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:rgba(13,12,10,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.bar .wrap{display:flex;align-items:center;gap:12px;min-height:60px}
+.bar img{width:36px;height:36px}
+.bar .grow{flex:1;min-width:0}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 16px;border-radius:2px;border:1px solid var(--gold);font:600 .85rem/1 var(--label);letter-spacing:.12em;text-transform:uppercase;cursor:pointer;text-decoration:none;background:transparent;color:var(--gold-hi)}
+.btn-gold{background:var(--gold);color:#14100a}
+.btn-sm{min-height:34px;padding:0 10px;font-size:.74rem}
+.btn-danger{border-color:var(--off);color:var(--off)}
+input,select,textarea{width:100%;min-height:44px;background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:2px;padding:8px 10px;font:400 1rem var(--body)}
+input:focus,select:focus,textarea:focus{border-color:var(--gold);outline:none}
+.login{max-width:380px;margin:12vh auto 0;display:grid;gap:14px;padding:28px;background:var(--panel);border:1px solid var(--line)}
+.login img{width:72px;height:72px;justify-self:center}
+.err{color:var(--off);min-height:1.3em;margin:0;font-size:.92rem}
+main{padding-block:20px 60px;display:grid;gap:18px}
+.days{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px}
+.day{flex:none;display:grid;gap:4px;justify-items:center;min-width:70px;padding:9px 8px;background:var(--panel);border:1px solid var(--line);color:var(--fg);cursor:pointer;border-radius:2px}
+.day b{font:600 .8rem/1 var(--label);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.day span{font:600 1.1rem/1 var(--label)}
+.day[aria-pressed="true"]{background:var(--gold);border-color:var(--gold);color:#14100a}
+.day[aria-pressed="true"] b{color:#14100a}
+.summary{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:baseline;justify-content:space-between}
+.summary h2{font:700 1.25rem/1.2 var(--display);margin:0}
+.count{font:500 .95rem var(--label);letter-spacing:.06em;color:var(--muted)}
+.count b{color:var(--gold-hi)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.cell{display:grid;gap:6px;align-content:start;min-height:118px;padding:12px;background:var(--panel);border:1px solid var(--line);border-radius:2px;position:relative}
+.cell .who{font:600 1.05rem/1.2 var(--body);color:var(--fg);min-height:1.2em;overflow-wrap:anywhere}
+.cell .time{font:600 1.5rem/1 var(--label);font-variant-numeric:tabular-nums;color:var(--muted)}
+.cell .svc{font-size:.82rem;color:var(--muted)}
+.cell .meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:auto}
+.cell.busy{border-color:var(--gold)}
+.cell.busy .time{color:var(--gold-hi)}
+.cell.blocked{border-style:dashed;border-color:var(--muted)}
+.cell.blocked .who{color:var(--muted)}
+.cell.free .who{color:var(--ok);font:500 .78rem/1.4 var(--label);letter-spacing:.16em;text-transform:uppercase}
+.cell.past{opacity:.55}
+.tag{font:600 .62rem/1 var(--label);letter-spacing:.16em;text-transform:uppercase;padding:3px 6px;border:1px solid var(--line);color:var(--muted);align-self:start;justify-self:start}
+.note{font-size:.82rem;color:var(--fg);background:var(--bg);padding:6px 8px;border-left:2px solid var(--gold-lo)}
+.tel{font-size:.85rem;color:var(--gold-hi)}
+dialog{background:var(--panel);color:var(--fg);border:1px solid var(--gold);padding:22px;width:min(440px,calc(100vw - 32px));border-radius:2px}
+dialog::backdrop{background:rgba(0,0,0,.7)}
+dialog form{display:grid;gap:12px}
+dialog h3{font:700 1.2rem/1.2 var(--display);margin:0}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.row .btn{flex:1}
+.hint{color:var(--muted);font-size:.85rem;margin:0}
+[hidden]{display:none!important}
+@media (max-width:420px){.grid{grid-template-columns:1fr 1fr}.cell{min-height:110px;padding:10px}.cell .time{font-size:1.3rem}}
+</style>
+</head>
+<body>
+
+<section class="login" id="login">
+  <img src="img/logo.png" alt="The King's Barbershop">
+  <h1 style="text-align:center">Agenda de turnos</h1>
+  <form id="loginForm">
+    <div style="display:grid;gap:8px">
+      <label for="clave">Contraseña</label>
+      <input id="clave" type="password" autocomplete="current-password" required>
+    </div>
+    <p class="err" id="loginErr" aria-live="polite"></p>
+    <button class="btn btn-gold" type="submit" style="width:100%">Entrar</button>
+  </form>
+</section>
+
+<div id="app" hidden>
+  <header class="bar">
+    <div class="wrap">
+      <img src="img/logo.png" alt="">
+      <div class="grow"><div class="eyebrow">The King's Barbershop</div><h1>Agenda</h1></div>
+      <button class="btn btn-sm" id="refresh" type="button">Actualizar</button>
+      <button class="btn btn-sm" id="salir" type="button">Salir</button>
+    </div>
+  </header>
+  <main class="wrap">
+    <div class="days" id="days" aria-label="Elegí el día"></div>
+    <div class="summary">
+      <h2 id="diaTitulo">—</h2>
+      <span class="count" id="count"></span>
+    </div>
+    <p class="err" id="appErr" aria-live="polite"></p>
+    <div class="grid" id="grid"></div>
+    <p class="hint">Tocá un horario libre para cargar un turno (alguien que llamó o vino al local) o para bloquearlo. Los horarios ocupados ya no se pueden elegir en la web.</p>
+  </main>
+</div>
+
+<dialog id="addDlg">
+  <form id="addForm" method="dialog">
+    <h3 id="addTitle">Cargar turno</h3>
+    <div style="display:grid;gap:6px"><label for="aNombre">Nombre del cliente</label><input id="aNombre" maxlength="60" autocomplete="off"></div>
+    <div style="display:grid;gap:6px"><label for="aTel">WhatsApp (opcional)</label><input id="aTel" type="tel" maxlength="25" autocomplete="off"></div>
+    <div style="display:grid;gap:6px"><label for="aSvc">Servicio</label>
+      <select id="aSvc"><option value="corte">Corte ($13.000)</option><option value="corte-barba">Corte + barba ($17.000)</option><option value="color">Color ($50.000)</option><option value="otro">Otro</option></select>
+    </div>
+    <div style="display:grid;gap:6px"><label for="aNota">Nota (opcional)</label><input id="aNota" maxlength="300" autocomplete="off"></div>
+    <p class="err" id="addErr" aria-live="polite"></p>
+    <div class="row">
+      <button class="btn btn-gold" id="addOk" type="button">Guardar turno</button>
+      <button class="btn" id="addBlock" type="button">Bloquear horario</button>
+    </div>
+    <button class="btn btn-sm" id="addCancel" type="button">Cerrar</button>
+  </form>
+</dialog>
+
+<dialog id="delDlg">
+  <form method="dialog">
+    <h3>Cancelar turno</h3>
+    <p id="delText" style="margin:0"></p>
+    <p class="err" id="delErr" aria-live="polite"></p>
+    <div class="row">
+      <button class="btn btn-danger" id="delOk" type="button">Sí, cancelar</button>
+      <button class="btn" id="delNo" type="button">No</button>
+    </div>
+  </form>
+</dialog>
+
+<script>
+(function(){
+  var OPEN=10, CLOSE=21, SLOT=45, KEY="kings_admin";
+  var DAYS=["Domingo","Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"], SHORT=["Dom","Lun","Mar","Mié","Jue","Vie","Sáb"];
+  var clave="", fecha="", turnos=[], slotSel="";
+  function $(id){return document.getElementById(id)}
+  function pad(x){return (x<10?"0":"")+x}
+  function nowCba(){
+    var p={};
+    new Intl.DateTimeFormat("en-US",{timeZone:"America/Argentina/Cordoba",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hour12:false})
+      .formatToParts(new Date()).forEach(function(x){p[x.type]=x.value});
+    return {fecha:p.year+"-"+p.month+"-"+p.day, mins:(+p.hour%24)*60+(+p.minute)};
+  }
+  function api(body){
+    body.clave=clave;
+    return fetch("/api/admin",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)})
+      .then(function(r){ return r.json().catch(function(){return {};}).then(function(j){ if(!r.ok){ var e=new Error(j.error||"Error"); e.status=r.status; throw e; } return j; }); });
+  }
+  function esc(s){ return String(s||"").replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]}); }
+
+  // --- Login ---
+  try{ clave=sessionStorage.getItem(KEY)||""; }catch(e){}
+  if (clave) api({accion:"entrar"}).then(start, function(){ clave=""; });
+  $("loginForm").addEventListener("submit",function(e){
+    e.preventDefault(); clave=$("clave").value; $("loginErr").textContent="";
+    api({accion:"entrar"}).then(function(){ try{sessionStorage.setItem(KEY,clave)}catch(e){} start(); })
+      .catch(function(er){ $("loginErr").textContent=er.message; });
+  });
+  $("salir").addEventListener("click",function(){ try{sessionStorage.removeItem(KEY)}catch(e){} location.reload(); });
+
+  // --- Agenda ---
+  function start(){
+    $("login").hidden=true; $("app").hidden=false;
+    var n=nowCba(), p=n.fecha.split("-"), dt=new Date(Date.UTC(+p[0],+p[1]-1,+p[2])), box=$("days");
+    box.innerHTML="";
+    for (var c=0,k=0;c<14&&k<20;k++,dt.setUTCDate(dt.getUTCDate()+1)){
+      if (dt.getUTCDay()===0) continue;
+      var v=dt.toISOString().slice(0,10), b=document.createElement("button");
+      b.type="button"; b.className="day"; b.dataset.v=v;
+      b.innerHTML="<b>"+(v===n.fecha?"Hoy":SHORT[dt.getUTCDay()])+"</b><span>"+dt.getUTCDate()+"/"+(dt.getUTCMonth()+1)+"</span>";
+      box.appendChild(b); c++;
+    }
+    box.addEventListener("click",function(e){ var b=e.target.closest(".day"); if(b) load(b.dataset.v); });
+    load(box.firstChild.dataset.v);
+    setInterval(function(){ if(!document.hidden && !$("addDlg").open && !$("delDlg").open) load(fecha,true); },60000);
+  }
+  function load(f,quiet){
+    fecha=f;
+    [].forEach.call($("days").children,function(b){ b.setAttribute("aria-pressed", b.dataset.v===f); });
+    var p=f.split("-"), d=new Date(Date.UTC(+p[0],+p[1]-1,+p[2]));
+    $("diaTitulo").textContent=DAYS[d.getUTCDay()]+" "+(+p[2])+"/"+(+p[1]);
+    if(!quiet){ $("grid").innerHTML='<p class="hint">Cargando…</p>'; }
+    $("appErr").textContent="";
+    api({accion:"listar",fecha:f}).then(function(j){ if(f!==fecha) return; turnos=j.turnos||[]; render(); })
+      .catch(function(er){ if(er.status===401){ try{sessionStorage.removeItem(KEY)}catch(e){} location.reload(); return; } $("appErr").textContent=er.message; });
+  }
+  function render(){
+    var n=nowCba(), grid=$("grid"), map={}, ocup=0, html="";
+    turnos.forEach(function(t){ map[t.hora]=t; });
+    for (var t0=OPEN*60;t0+SLOT<=CLOSE*60;t0+=SLOT){
+      var h=pad(Math.floor(t0/60))+":"+pad(t0%60), t=map[h], past=(fecha===n.fecha && t0+SLOT<=n.mins);
+      if (t){
+        var blocked=t.servicio==="Horario bloqueado";
+        if(!blocked) ocup++;
+        html+='<div class="cell '+(blocked?"blocked":"busy")+(past?" past":"")+'">'+
+          '<div class="who">'+esc(t.nombre)+'</div>'+
+          '<div class="time">'+h+'</div>'+
+          (blocked?'':'<div class="svc">'+esc(t.servicio)+'</div>')+
+          (t.telefono?'<a class="tel" href="https://wa.me/'+esc(String(t.telefono).replace(/\D/g,"").replace(/^0/,"").replace(/^(?!54)/,"549"))+'" target="_blank" rel="noopener">'+esc(t.telefono)+'</a>':'')+
+          (t.nota?'<div class="note">'+esc(t.nota)+'</div>':'')+
+          '<div class="meta"><span class="tag">'+(t.origen==="web"?"Web":"Local")+'</span>'+
+          '<button class="btn btn-sm btn-danger" type="button" data-del="'+h+'">'+(blocked?"Liberar":"Cancelar")+'</button></div></div>';
+      } else {
+        html+='<button type="button" class="cell free'+(past?" past":"")+'" data-add="'+h+'" style="text-align:left;cursor:pointer">'+
+          '<div class="who">Libre</div><div class="time">'+h+'</div><div class="svc">Tocá para cargar</div></button>';
+      }
+    }
+    grid.innerHTML=html;
+    var libres=grid.querySelectorAll(".cell.free").length;
+    $("count").innerHTML="<b>"+ocup+"</b> turno"+(ocup===1?"":"s")+" · "+libres+" libre"+(libres===1?"":"s");
+  }
+  $("refresh").addEventListener("click",function(){ load(fecha); });
+
+  // --- Cargar / bloquear ---
+  $("grid").addEventListener("click",function(e){
+    var a=e.target.closest("[data-add]"), d=e.target.closest("[data-del]");
+    if (a){ slotSel=a.dataset.add; $("addTitle").textContent="Cargar turno · "+$("diaTitulo").textContent+" "+slotSel;
+      $("aNombre").value=""; $("aTel").value=""; $("aNota").value=""; $("aSvc").value="corte"; $("addErr").textContent="";
+      $("addDlg").showModal(); $("aNombre").focus(); }
+    if (d){ slotSel=d.dataset.del; var t=turnos.filter(function(x){return x.hora===slotSel})[0]||{};
+      $("delText").textContent=(t.servicio==="Horario bloqueado"?"¿Liberar el horario de las ":"¿Cancelar el turno de "+(t.nombre||"")+" a las ")+slotSel+"? El horario vuelve a quedar libre en la web.";
+      $("delErr").textContent=""; $("delDlg").showModal(); }
+  });
+  function guardar(bloquear){
+    var body={accion:"agregar",fecha:fecha,hora:slotSel,nombre:$("aNombre").value.trim(),telefono:$("aTel").value.trim(),servicio:bloquear?"bloqueado":$("aSvc").value,nota:$("aNota").value.trim()};
+    if (!bloquear && !body.nombre){ $("addErr").textContent="Escribí el nombre del cliente."; $("aNombre").focus(); return; }
+    $("addOk").disabled=$("addBlock").disabled=true;
+    api(body).then(function(){ $("addDlg").close(); load(fecha); })
+      .catch(function(er){ $("addErr").textContent=er.message; if(er.status===409) load(fecha,true); })
+      .then(function(){ $("addOk").disabled=$("addBlock").disabled=false; });
+  }
+  $("addOk").addEventListener("click",function(){ guardar(false); });
+  $("addBlock").addEventListener("click",function(){ guardar(true); });
+  $("addCancel").addEventListener("click",function(){ $("addDlg").close(); });
+  $("delNo").addEventListener("click",function(){ $("delDlg").close(); });
+  $("delOk").addEventListener("click",function(){
+    $("delOk").disabled=true;
+    api({accion:"cancelar",fecha:fecha,hora:slotSel}).then(function(){ $("delDlg").close(); load(fecha); })
+      .catch(function(er){ $("delErr").textContent=er.message; })
+      .then(function(){ $("delOk").disabled=false; });
+  });
+})();
+</script>
+</body>
+</html>
