@@ -1,0 +1,456 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<link rel="icon" href="img/logo.png">
+<meta property="og:title" content="The King's Barbershop">
+<meta property="og:description" content="Barbería en Saldán, Córdoba. Lunes a sábado de 10 a 21. Turnos por WhatsApp.">
+<meta property="og:image" content="img/logo.png">
+<title>The King's Barbershop</title>
+<meta name="description" content="Barbería en Saldán, Córdoba. Lunes a sábado de 10 a 21, por orden de llegada y turnos.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@500;600&display=swap">
+<style>
+/* Layout: sticky bar, split hero (title + vertical reel), info strip, media grids, booking form that writes a WhatsApp message, map + hours. Single deliberate dark look taken from the black-and-gold logo. */
+:root{
+  --bg:#0d0c0a;          /* lacquer black */
+  --panel:#16140f;       /* raised surface */
+  --line:#2c2719;        /* gold-tinted rule */
+  --fg:#efe9dc;          /* warm paper */
+  --muted:#a59d8b;
+  --gold:#c9a45c;        /* logo gold */
+  --gold-hi:#ecd29a;
+  --gold-lo:#8a6a2f;
+  --ok:#6fcf8e; --off:#d9826b;
+  --display:"Cinzel", "Trajan Pro", Georgia, serif;
+  --body:"Barlow", "Helvetica Neue", Arial, sans-serif;
+  --label:"Barlow Condensed", "Arial Narrow", Arial, sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);font:400 1.0625rem/1.6 var(--body);-webkit-font-smoothing:antialiased}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--gold-hi);outline-offset:3px}
+.wrap{max-width:1180px;margin-inline:auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.eyebrow{font:600 .8rem/1 var(--label);letter-spacing:.22em;text-transform:uppercase;color:var(--gold)}
+h1,h2{font-family:var(--display);font-weight:700;text-wrap:balance;margin:0;letter-spacing:.04em}
+h2{font-size:clamp(1.7rem,3.6vw,2.5rem);line-height:1.15}
+.sec{padding-block:clamp(56px,9vw,104px);border-top:1px solid var(--line)}
+.sec-head{display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:12px 32px;margin-bottom:32px}
+.sec-head p{margin:0;max-width:46ch;color:var(--muted)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:48px;padding:0 22px;border-radius:2px;font:600 .95rem/1 var(--label);letter-spacing:.14em;text-transform:uppercase;text-decoration:none;border:1px solid var(--gold);cursor:pointer;transition:background .2s,color .2s}
+.btn-gold{background:var(--gold);color:#14100a;border-color:var(--gold)}
+.btn-gold:hover{background:var(--gold-hi);border-color:var(--gold-hi)}
+.btn-ghost{background:transparent;color:var(--gold-hi)}
+.btn-ghost:hover{background:rgba(201,164,92,.12)}
+.btn svg{width:18px;height:18px;flex:none}
+
+/* header */
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;background:rgba(13,12,10,.88);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.bar .wrap{display:flex;align-items:center;gap:20px;min-height:64px}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;font:700 .95rem/1 var(--display);letter-spacing:.08em}
+.brand img{width:38px;height:38px}
+.bar nav{display:flex;gap:22px;margin-left:auto;font:500 .9rem/1 var(--label);letter-spacing:.16em;text-transform:uppercase}
+.bar nav a{text-decoration:none;color:var(--muted)}
+.bar nav a:hover{color:var(--gold-hi)}
+.bar .btn{min-height:40px;padding:0 16px}
+@media (max-width:760px){.bar nav{display:none}.bar .btn{margin-left:auto}.brand span{display:none}}
+
+/* hero */
+.hero{padding-block:clamp(36px,6vw,72px) clamp(48px,7vw,88px)}
+.hero .wrap{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,.75fr);gap:clamp(28px,5vw,64px);align-items:center}
+.hero-logo{width:96px;height:96px;margin-bottom:22px}
+.hero h1{font-size:clamp(2.6rem,7.4vw,5.6rem);line-height:.98;margin:14px 0 22px;
+  color:var(--fg)}
+.hero h1 small{display:block;font-size:.34em;letter-spacing:.42em;margin-top:.5em;font-weight:500;color:var(--gold)}
+.lede{font-size:1.15rem;max-width:44ch;color:var(--fg);margin:0 0 22px}
+.status{display:inline-flex;align-items:center;gap:10px;padding:8px 14px;border:1px solid var(--line);border-radius:99px;font:500 .95rem/1.2 var(--label);letter-spacing:.06em;margin-bottom:28px;background:var(--panel)}
+.status i{width:9px;height:9px;border-radius:50%;background:var(--muted);flex:none}
+.status.open i{background:var(--ok);box-shadow:0 0 0 4px rgba(111,207,142,.18)}
+.status.closed i{background:var(--off)}
+.cta{display:flex;flex-wrap:wrap;gap:12px}
+.reel{position:relative;aspect-ratio:9/16;max-width:100%;max-height:640px;margin-left:auto;border:1px solid var(--gold-lo);padding:8px;background:var(--panel)}
+.reel video{width:100%;height:100%;object-fit:cover;display:block}
+.reel figcaption{position:absolute;left:20px;bottom:20px;font:600 .8rem/1 var(--label);letter-spacing:.2em;text-transform:uppercase;background:rgba(13,12,10,.75);padding:8px 10px;color:var(--gold-hi)}
+@media (max-width:760px){.hero .wrap{grid-template-columns:1fr}.reel{margin:0 auto;width:min(100%,360px)}}
+
+/* info strip */
+.facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-block:1px solid var(--line);background:var(--panel)}
+.facts>div{padding:24px clamp(16px,3vw,32px);border-left:1px solid var(--line);min-width:0}
+.facts>div:first-child{border-left:0}
+.facts dt{margin-bottom:8px}
+.facts dd{margin:0;font-size:1.1rem}
+.facts dd small{display:block;color:var(--muted);font-size:.92rem}
+.copy{margin-top:8px;background:none;border:0;padding:0;color:var(--gold);font:600 .8rem/1 var(--label);letter-spacing:.16em;text-transform:uppercase;cursor:pointer}
+@media (max-width:760px){.facts{grid-template-columns:1fr}.facts>div{border-left:0;border-top:1px solid var(--line)}.facts>div:first-child{border-top:0}}
+
+/* media grids */
+.grid{display:grid;gap:12px;grid-template-columns:repeat(4,minmax(0,1fr))}
+.tile{margin:0;position:relative;overflow:hidden;background:var(--panel);aspect-ratio:3/4;max-width:100%}
+.tile img,.tile video{width:100%;height:100%;object-fit:cover;display:block;transition:transform .5s}
+.tile:hover img,.tile:hover video{transform:scale(1.03)}
+.tile figcaption{position:absolute;inset:auto 0 0 0;padding:28px 14px 12px;background:linear-gradient(transparent,rgba(0,0,0,.78));font:600 .82rem/1.2 var(--label);letter-spacing:.16em;text-transform:uppercase;color:#f3ead6}
+.tile .tag{position:absolute;top:10px;left:10px;font:600 .7rem/1 var(--label);letter-spacing:.18em;text-transform:uppercase;padding:6px 8px;background:var(--gold);color:#1a1408}
+@media (max-width:900px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.works .big{grid-column:span 2;grid-row:span 2;aspect-ratio:auto}
+.works .top video{object-position:50% 0}
+.local{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media (max-width:640px){.local{grid-template-columns:1fr 1fr}.local .tile:first-child{grid-column:1/-1;aspect-ratio:4/3}}
+.strip{display:grid;grid-auto-flow:column;grid-auto-columns:clamp(200px,24vw,260px);gap:12px;overflow-x:auto;padding-bottom:12px;scroll-snap-type:x mandatory;scrollbar-color:var(--gold-lo) transparent}
+.strip .tile{scroll-snap-align:start}
+
+/* booking */
+.book{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:clamp(28px,5vw,64px);align-items:start}
+.book-copy p{color:var(--muted);max-width:42ch}
+.book-copy ol{margin:24px 0 0;padding:0;list-style:none;display:grid;gap:14px;counter-reset:s}
+.book-copy li{display:grid;grid-template-columns:34px 1fr;gap:12px;align-items:baseline;counter-increment:s}
+.book-copy li::before{content:counter(s);font:700 1.1rem/1 var(--display);color:var(--gold)}
+form{background:var(--panel);border:1px solid var(--line);padding:clamp(20px,3vw,32px);display:grid;gap:18px;grid-template-columns:1fr 1fr}
+.f{display:grid;gap:7px;min-width:0}
+.f.full{grid-column:1/-1}
+label,.legend{font:600 .82rem/1 var(--label);letter-spacing:.18em;text-transform:uppercase;color:var(--gold)}
+input,select,textarea{width:100%;min-height:48px;background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:2px;padding:10px 12px;font:400 1rem var(--body)}
+textarea{min-height:80px;resize:vertical}
+input:focus,select:focus,textarea:focus{border-color:var(--gold);outline:none}
+.svcs{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.svcs input{position:absolute;opacity:0;pointer-events:none;width:1px;height:1px}
+.svcs label{display:grid;gap:6px;text-transform:none;letter-spacing:0;color:var(--fg);border:1px solid var(--line);padding:14px;cursor:pointer;background:var(--bg);transition:border-color .2s}
+.svcs label b{font:600 1rem/1.1 var(--label);letter-spacing:.1em;text-transform:uppercase;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.svcs label em{font-style:normal;letter-spacing:.04em;color:var(--gold);font-variant-numeric:tabular-nums}
+.svcs label span{font:400 .9rem/1.4 var(--body);color:var(--muted)}
+.svcs label:hover{border-color:var(--gold-lo)}
+.svcs input:checked+label{border-color:var(--gold)}
+.svcs input:checked+label b{color:var(--gold)}
+.svcs input:focus-visible+label{outline:2px solid var(--gold-hi);outline-offset:2px}
+@media (max-width:520px){.svcs{grid-template-columns:1fr}}
+.days{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;scroll-snap-type:x proximity;scrollbar-color:var(--gold-lo) transparent}
+.day{flex:none;scroll-snap-align:start;display:grid;gap:4px;justify-items:center;min-width:72px;padding:10px 8px;background:var(--bg);border:1px solid var(--line);color:var(--fg);cursor:pointer;border-radius:2px}
+.day b{font:600 .85rem/1 var(--label);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.day span{font:600 1.15rem/1 var(--label);font-variant-numeric:tabular-nums}
+.day:hover{border-color:var(--gold-lo)}
+.day[aria-checked="true"]{border-color:var(--gold);background:var(--gold);color:#14100a}
+.day[aria-checked="true"] b{color:#14100a}
+.err{color:var(--off);font-size:.9rem;min-height:1.2em;margin:0}
+.preview{grid-column:1/-1;font-size:.92rem;color:var(--muted);border-left:2px solid var(--gold-lo);padding-left:12px;white-space:pre-line;margin:0}
+form .btn{grid-column:1/-1;min-height:54px}
+@media (max-width:860px){.book{grid-template-columns:1fr}}
+@media (max-width:520px){form{grid-template-columns:1fr}}
+
+/* visit */
+.visit{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(28px,5vw,64px)}
+.addr{font:700 clamp(1.6rem,3.4vw,2.3rem)/1.15 var(--display);margin:14px 0 6px;letter-spacing:.03em}
+.visit p{color:var(--muted);margin:0 0 22px}
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+td{padding:12px 0;border-bottom:1px solid var(--line)}
+td:last-child{text-align:right;color:var(--muted)}
+tr.today td{color:var(--gold-hi)}
+tr.today td:first-child::after{content:"hoy";margin-left:10px;font:600 .7rem/1 var(--label);letter-spacing:.18em;text-transform:uppercase;padding:4px 6px;border:1px solid var(--gold-lo)}
+@media (max-width:760px){.visit{grid-template-columns:1fr}}
+
+footer{border-top:1px solid var(--line);padding-block:32px;color:var(--muted);font-size:.92rem}
+footer .wrap{display:flex;flex-wrap:wrap;gap:12px 28px;align-items:center;justify-content:space-between}
+footer a{color:var(--gold-hi)}
+.fab{position:fixed;right:calc(16px + env(safe-area-inset-right,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:9;width:56px;height:56px;border-radius:50%;display:grid;place-items:center;background:#25d366;color:#0b2e17;box-shadow:0 6px 20px rgba(0,0,0,.45)}
+.fab svg{width:28px;height:28px}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.tile img,.tile video{transition:none}}
+</style>
+</head>
+<body>
+
+
+<header class="bar">
+  <div class="wrap">
+    <a class="brand" href="#inicio"><img src="img/logo.png" alt="" width="38" height="38"><span>The King's</span></a>
+    <nav aria-label="Secciones">
+      <a href="#trabajos">Trabajos</a>
+      <a href="#local">El local</a>
+      <a href="#turno">Turnos</a>
+      <a href="#visita">Cómo llegar</a>
+    </nav>
+    <a class="btn btn-gold" href="#turno">Sacar turno</a>
+  </div>
+</header>
+
+<main id="inicio">
+  <section class="hero">
+    <div class="wrap">
+      <div>
+        <img class="hero-logo" src="img/logo.png" alt="Logo de The King's Barbershop" width="96" height="96">
+        <div class="eyebrow">Barbería · Saldán, Córdoba</div>
+        <h1>The King's<small>Barbershop</small></h1>
+        <p class="lede">Fades, texturizados y barba. Abrimos de lunes a sábado, de 10 a 21. Podés venir por orden de llegada o sacar turno.</p>
+        <div class="status" id="status" role="status"><i></i><span id="statusText">Lunes a sábado · 10 a 21</span></div>
+        <div class="cta">
+          <a class="btn btn-gold" href="#turno">Sacar turno</a>
+          <a class="btn btn-ghost" href="https://www.google.com/maps/search/?api=1&amp;query=Eva%20Per%C3%B3n%201381%2C%20Sald%C3%A1n%2C%20C%C3%B3rdoba%2C%20Argentina" target="_blank" rel="noopener">Cómo llegar</a>
+        </div>
+      </div>
+      <figure class="reel">
+        <video src="vid/fade-rulos.mp4" poster="vid/fade-rulos.jpg" autoplay muted loop playsinline aria-label="Video de un fade con rulos"></video>
+        <figcaption>Fade + rulos</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <dl class="facts wrap" style="max-width:none">
+    <div><dt class="eyebrow">Horario</dt><dd>Lunes a sábado, 10 a 21<small>Orden de llegada y turnos</small></dd></div>
+    <div><dt class="eyebrow">Dirección</dt><dd>Eva Perón 1381<small>Saldán, Córdoba</small></dd></div>
+    <div><dt class="eyebrow">WhatsApp</dt><dd><span id="num">351 354-2473</span><small><button class="copy" type="button" id="copyNum">Copiar número</button></small></dd></div>
+  </dl>
+
+  <section class="sec" id="trabajos">
+    <div class="wrap">
+      <div class="sec-head">
+        <div><div class="eyebrow">Trabajos</div><h2>Lo que sale de la silla</h2></div>
+        <p>Degradés prolijos, texturas con movimiento y barbas marcadas. Todo hecho en el local.</p>
+      </div>
+      <div class="grid works">
+        <figure class="tile big"><video src="vid/texturizado.mp4" poster="vid/texturizado.jpg" autoplay muted loop playsinline aria-label="Video de un corte texturizado"></video><span class="tag">Video</span><figcaption>Texturizado</figcaption></figure>
+        <figure class="tile"><img src="img/corte-rulos.jpg" alt="Corte con fade y rulos arriba" loading="lazy"><figcaption>Fade con rulos</figcaption></figure>
+        <figure class="tile"><img src="img/corte-barba.jpg" alt="Corte con fade y barba perfilada" loading="lazy"><figcaption>Corte + barba</figcaption></figure>
+        <figure class="tile top"><video src="vid/maquina.mp4" poster="vid/maquina.jpg" autoplay muted loop playsinline aria-label="Video de detalle con máquina"></video><span class="tag">Video</span><figcaption>Detalle a máquina</figcaption></figure>
+        <figure class="tile"><img src="img/corte-texturizado.jpg" alt="Corte texturizado con fade y raya" loading="lazy"><figcaption>Fade con raya</figcaption></figure>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="local">
+    <div class="wrap">
+      <div class="sec-head">
+        <div><div class="eyebrow">El local</div><h2>Eva Perón 1381, Saldán</h2></div>
+        <p>Aire acondicionado, buena luz y un lugar para esperar tranquilo si venís por orden de llegada.</p>
+      </div>
+      <div class="grid local">
+        <figure class="tile"><img src="img/local-trabajo.jpg" alt="Barbero cortando en el local, con camisetas de fútbol en la pared" loading="lazy"></figure>
+        <figure class="tile"><img src="img/local-techo.jpg" alt="Salón con luces hexagonales en el techo y sillones" loading="lazy"></figure>
+        <figure class="tile"><img src="img/local-logo.jpg" alt="Pared con el logo de The King's Barbershop" loading="lazy"></figure>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="clientes">
+    <div class="wrap">
+      <div class="sec-head">
+        <div><div class="eyebrow">Clientes</div><h2>Pasaron por la silla</h2></div>
+        <p>Clientes del barrio, jugadores y artistas. Deslizá para ver más.</p>
+      </div>
+      <div class="strip" tabindex="0" aria-label="Fotos con clientes">
+        <figure class="tile"><img src="img/cliente-1.jpg" alt="El barbero con un cliente" loading="lazy"></figure>
+        <figure class="tile"><img src="img/cliente-8.jpg" alt="El barbero con un cliente" loading="lazy"></figure>
+        <figure class="tile"><img src="img/evento-1.jpg" alt="Corte en un estudio de producción" loading="lazy"></figure>
+        <figure class="tile"><img src="img/cliente-4.jpg" alt="El barbero con un cliente" loading="lazy"></figure>
+        <figure class="tile"><video src="vid/set-estudio.mp4" poster="vid/set-estudio.jpg" muted loop playsinline autoplay aria-label="Video de un corte en un set"></video><span class="tag">Video</span></figure>
+        <figure class="tile"><img src="img/cliente-3.jpg" alt="El barbero con un cliente" loading="lazy"></figure>
+        <figure class="tile"><img src="img/cliente-7.jpg" alt="El barbero con un cliente" loading="lazy"></figure>
+        <figure class="tile"><img src="img/evento-2.jpg" alt="Perfilado de barba en un set" loading="lazy"></figure>
+        <figure class="tile"><img src="img/cliente-5.jpg" alt="El barbero con un cliente en el local" loading="lazy"></figure>
+        <figure class="tile"><img src="img/cliente-6.jpg" alt="El barbero con un cliente en el local" loading="lazy"></figure>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="turno">
+    <div class="wrap book">
+      <div class="book-copy">
+        <div class="eyebrow">Turnos</div>
+        <h2>Pedí tu turno por WhatsApp</h2>
+        <p>Completá los datos y se abre WhatsApp con el mensaje listo. Los turnos son cada 45 minutos y te confirmamos el horario por ahí.</p>
+        <ol>
+          <li><span>Elegí servicio, día y horario.</span></li>
+          <li><span>Tocá <b>Enviar por WhatsApp</b> y mandá el mensaje.</span></li>
+          <li><span>Esperá la confirmación. Si no llegás, avisanos.</span></li>
+        </ol>
+      </div>
+      <form id="bookForm" novalidate>
+        <div class="f full">
+          <label for="nombre">Tu nombre</label>
+          <input id="nombre" name="nombre" autocomplete="given-name" placeholder="Ej: Juan">
+        </div>
+        <div class="f full">
+          <span class="legend" id="servLbl">Servicio</span>
+          <div class="svcs" role="radiogroup" aria-labelledby="servLbl">
+            <input type="radio" name="servicio" id="s1" value="Corte ($13.000)" checked><label for="s1"><b>Corte <em>$13.000</em></b><span>Degradé, texturizado o clásico. Lavado y peinado al final.</span></label>
+            <input type="radio" name="servicio" id="s2" value="Corte + barba ($17.000)"><label for="s2"><b>Corte + barba <em>$17.000</em></b><span>Corte completo y barba perfilada a navaja, con toalla caliente.</span></label>
+            <input type="radio" name="servicio" id="s3" value="Color ($50.000)"><label for="s3"><b>Color <em>$50.000</em></b><span>Platinado, decoloración o color de fantasía. Traé una foto de referencia.</span></label>
+            <input type="radio" name="servicio" id="s4" value="Otro (lo charlamos)"><label for="s4"><b>Otro <em>Consultá</em></b><span>Diseño, cejas o lo que tengas en mente. Contanos en el comentario.</span></label>
+          </div>
+        </div>
+        <div class="f full">
+          <span class="legend" id="diaLbl">Día</span>
+          <div class="days" id="days" role="radiogroup" aria-labelledby="diaLbl"></div>
+          <input type="hidden" id="dia" name="dia">
+        </div>
+        <div class="f full">
+          <label for="hora">Horario</label>
+          <select id="hora" name="hora"></select>
+        </div>
+        <div class="f full">
+          <label for="nota">Comentario (opcional)</label>
+          <textarea id="nota" name="nota" placeholder="Ej: degradé bajo, traigo foto de referencia"></textarea>
+        </div>
+        <p class="err full" id="err" aria-live="polite"></p>
+        <p class="preview" id="preview"></p>
+        <a class="btn btn-gold" id="sendWa" href="https://wa.me/5493513542473" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.6.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.8 11.9 11.9 0 0 0 4.6 4c1.7.7 2.4.8 3.2.7a2.8 2.8 0 0 0 1.8-1.3 2.3 2.3 0 0 0 .2-1.3c-.1-.1-.3-.2-.5-.3Z"/></svg>
+          Enviar por WhatsApp
+        </a>
+      </form>
+    </div>
+  </section>
+
+  <section class="sec" id="visita">
+    <div class="wrap visit">
+      <div>
+        <div class="eyebrow">Cómo llegar</div>
+        <div class="addr">Eva Perón 1381</div>
+        <p>Saldán, Córdoba</p>
+        <div class="cta">
+          <a class="btn btn-gold" href="https://www.google.com/maps/search/?api=1&amp;query=Eva%20Per%C3%B3n%201381%2C%20Sald%C3%A1n%2C%20C%C3%B3rdoba%2C%20Argentina" target="_blank" rel="noopener">Abrir en Google Maps</a>
+          <a class="btn btn-ghost" href="https://www.instagram.com/the.kingsbarbershop_/" target="_blank" rel="noopener">Instagram</a>
+        </div>
+      </div>
+      <div>
+        <div class="eyebrow">Horarios</div>
+        <table id="hours" aria-label="Horarios de atención">
+          <tbody>
+            <tr data-d="1"><td>Lunes</td><td>10:00 – 21:00</td></tr>
+            <tr data-d="2"><td>Martes</td><td>10:00 – 21:00</td></tr>
+            <tr data-d="3"><td>Miércoles</td><td>10:00 – 21:00</td></tr>
+            <tr data-d="4"><td>Jueves</td><td>10:00 – 21:00</td></tr>
+            <tr data-d="5"><td>Viernes</td><td>10:00 – 21:00</td></tr>
+            <tr data-d="6"><td>Sábado</td><td>10:00 – 21:00</td></tr>
+            <tr data-d="0"><td>Domingo</td><td>Cerrado</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© The King's Barbershop · Saldán, Córdoba</span>
+    <span><a href="https://www.instagram.com/the.kingsbarbershop_/" target="_blank" rel="noopener">@the.kingsbarbershop_</a> · WhatsApp 351 354-2473</span>
+  </div>
+</footer>
+
+<a class="fab" href="https://wa.me/5493513542473" target="_blank" rel="noopener" aria-label="Escribir por WhatsApp">
+  <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.6.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.8 11.9 11.9 0 0 0 4.6 4c1.7.7 2.4.8 3.2.7a2.8 2.8 0 0 0 1.8-1.3 2.3 2.3 0 0 0 .2-1.3c-.1-.1-.3-.2-.5-.3Z"/></svg>
+</a>
+
+<script>
+(function(){
+  var WA = "5493513542473", OPEN = 10, CLOSE = 21, SLOT = 45;
+  var DAYS = ["domingo","lunes","martes","miércoles","jueves","viernes","sábado"];
+
+  // Hora actual en Córdoba, sin depender de la zona del visitante
+  function nowCba(){
+    var p = {};
+    new Intl.DateTimeFormat("en-US",{timeZone:"America/Argentina/Cordoba",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hour12:false,weekday:"short"})
+      .formatToParts(new Date()).forEach(function(x){p[x.type]=x.value});
+    var wd = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].indexOf(p.weekday);
+    return {y:+p.year,m:+p.month,d:+p.day,h:(+p.hour)%24,min:+p.minute,wd:wd};
+  }
+  var n = nowCba();
+
+  // Estado abierto / cerrado
+  var st = document.getElementById("status"), stT = document.getElementById("statusText");
+  var mins = n.h*60+n.min, workday = n.wd>=1 && n.wd<=6;
+  if (workday && mins>=OPEN*60 && mins<CLOSE*60){
+    st.className="status open"; stT.textContent="Abierto ahora · cierra a las 21";
+  } else {
+    st.className="status closed";
+    var next = (workday && mins<OPEN*60) ? "hoy a las 10" : (n.wd===6||n.wd===0 ? "el lunes a las 10" : "mañana a las 10");
+    stT.textContent="Cerrado · abre "+next;
+  }
+  var row = document.querySelector('#hours tr[data-d="'+n.wd+'"]'); if(row) row.className="today";
+
+  // Copiar número
+  var cb = document.getElementById("copyNum");
+  cb.addEventListener("click",function(){
+    var done=function(){cb.textContent="Copiado"; setTimeout(function(){cb.textContent="Copiar número"},1800)};
+    try{ navigator.clipboard.writeText("+54 9 351 354-2473").then(done,sel); }catch(e){ sel(); }
+    function sel(){var r=document.createRange();r.selectNodeContents(document.getElementById("num"));var s=getSelection();s.removeAllRanges();s.addRange(r);}
+  });
+
+  // Formulario de turno
+  var f=document.getElementById("bookForm"), dia=document.getElementById("dia"), hora=document.getElementById("hora"),
+      nombre=document.getElementById("nombre"), nota=document.getElementById("nota"),
+      err=document.getElementById("err"), prev=document.getElementById("preview"), send=document.getElementById("sendWa");
+  function pad(x){return (x<10?"0":"")+x}
+  function iso(y,m,d){return y+"-"+pad(m)+"-"+pad(d)}
+  var today = iso(n.y,n.m,n.d);
+  dia.min = today;
+  // primer día hábil disponible
+  var start = new Date(Date.UTC(n.y,n.m-1,n.d));
+  if (n.wd===0 || (workday && mins>=CLOSE*60-SLOT-15)) { do { start.setUTCDate(start.getUTCDate()+1); } while(start.getUTCDay()===0); }
+  dia.value = start.toISOString().slice(0,10);
+
+  // Botones con los próximos 12 días hábiles (sin domingos)
+  var daysBox=document.getElementById("days"), SHORT=["Dom","Lun","Mar","Mié","Jue","Vie","Sáb"];
+  var dt=new Date(Date.UTC(n.y,n.m-1,n.d)), tomorrow=new Date(dt.getTime()+864e5).toISOString().slice(0,10);
+  for (var c=0,k=0; c<12 && k<20; k++, dt.setUTCDate(dt.getUTCDate()+1)){
+    var v=dt.toISOString().slice(0,10);
+    if (dt.getUTCDay()===0 || v<dia.value) continue;
+    var b=document.createElement("button"); b.type="button"; b.className="day"; b.setAttribute("role","radio"); b.dataset.v=v;
+    b.innerHTML="<b>"+(v===today?"Hoy":v===tomorrow?"Mañana":SHORT[dt.getUTCDay()])+"</b><span>"+dt.getUTCDate()+"/"+(dt.getUTCMonth()+1)+"</span>";
+    daysBox.appendChild(b); c++;
+  }
+  function markDay(){ [].forEach.call(daysBox.children,function(b){ var on=b.dataset.v===dia.value; b.setAttribute("aria-checked",on); b.tabIndex=on?0:-1; }); }
+  daysBox.addEventListener("click",function(e){
+    var b=e.target.closest(".day"); if(!b) return;
+    dia.value=b.dataset.v; markDay(); fillHours(); update();
+  });
+  markDay();
+
+  function fillHours(){
+    var keep=hora.value; hora.innerHTML="";
+    var isToday = dia.value===today;
+    // turnos cada 45 minutos: 10:00, 10:45, 11:30 ... el último termina a las 21:00
+    for (var t0=OPEN*60; t0+SLOT<=CLOSE*60; t0+=SLOT){
+      if (isToday && t0 <= mins+15) continue;
+      var t=pad(Math.floor(t0/60))+":"+pad(t0%60), o=document.createElement("option"); o.value=o.textContent=t; hora.appendChild(o);
+    }
+    if (!hora.options.length){var o=document.createElement("option");o.value="";o.textContent="Sin horarios hoy";hora.appendChild(o);}
+    if ([].some.call(hora.options,function(o){return o.value===keep})) hora.value=keep;
+  }
+  function dayName(v){ var p=v.split("-"); return DAYS[new Date(Date.UTC(+p[0],+p[1]-1,+p[2])).getUTCDay()]; }
+  function check(){
+    if (!nombre.value.trim()) return "Escribí tu nombre.";
+    if (!dia.value) return "Elegí un día.";
+    if (dia.value < today) return "Elegí un día de hoy en adelante.";
+    if (dayName(dia.value)==="domingo") return "Los domingos está cerrado. Elegí de lunes a sábado.";
+    if (!hora.value) return "No quedan horarios para ese día. Probá con otro.";
+    return "";
+  }
+  function message(){
+    var s=f.querySelector('input[name="servicio"]:checked').value, p=dia.value.split("-");
+    var txt="Hola! Quiero sacar un turno en The King's Barbershop.\n"+
+      "Nombre: "+(nombre.value.trim()||"—")+"\n"+
+      "Servicio: "+s+"\n"+
+      "Día: "+(dia.value? dayName(dia.value)+" "+p[2]+"/"+p[1] : "—")+"\n"+
+      "Horario: "+(hora.value||"—");
+    if (nota.value.trim()) txt+="\nComentario: "+nota.value.trim();
+    return txt;
+  }
+  function update(){
+    var m=message(); prev.textContent=m;
+    send.href="https://wa.me/"+WA+"?text="+encodeURIComponent(m);
+    if (err.textContent) err.textContent=check();
+  }
+  f.addEventListener("input",update);
+  f.addEventListener("change",update);
+  f.addEventListener("submit",function(e){e.preventDefault()});
+  send.addEventListener("click",function(e){
+    var problem=check();
+    if (problem){ e.preventDefault(); err.textContent=problem; (problem.indexOf("nombre")>-1?nombre:(problem.indexOf("horarios")>-1?hora:daysBox.querySelector(".day"))).focus(); }
+  });
+  fillHours(); update();
+})();
+</script>
+
+</body>
+</html>
