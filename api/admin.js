@@ -2,6 +2,7 @@
 import crypto from 'node:crypto';
 import {
   SERVICIOS, fechaValida, validarHorario, turnosDelDia, guardarTurno, cancelarTurno, limpiar, json,
+  turnosRango, ahora, sumarDias, claveCalendario,
 } from '../lib/turnos.js';
 
 function claveCorrecta(clave) {
@@ -23,6 +24,16 @@ export default async function handler(req, res) {
       const fecha = limpiar(b.fecha, 10);
       if (!fechaValida(fecha)) return json(res, 400, { error: 'Fecha no válida.' });
       return json(res, 200, { fecha, turnos: await turnosDelDia(fecha) });
+    }
+
+    if (b.accion === 'proximos') {
+      const hoy = ahora().fecha;
+      return json(res, 200, { hoy, turnos: await turnosRango(hoy, sumarDias(hoy, 30)) });
+    }
+
+    if (b.accion === 'calendario') {
+      const host = req.headers['x-forwarded-host'] || req.headers.host;
+      return json(res, 200, { url: `https://${host}/api/calendario?k=${claveCalendario()}` });
     }
 
     if (b.accion === 'agregar') {

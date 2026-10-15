@@ -64,7 +64,29 @@ dialog h3{font:700 1.2rem/1.2 var(--display);margin:0}
 .row{display:flex;gap:8px;flex-wrap:wrap}
 .row .btn{flex:1}
 .hint{color:var(--muted);font-size:.85rem;margin:0}
+.day{position:relative}
+.day i{position:absolute;top:-6px;right:-6px;min-width:20px;height:20px;padding:0 5px;border-radius:10px;background:var(--gold);color:#14100a;font:700 .72rem/20px var(--label);font-style:normal;text-align:center}
+.day[aria-pressed="true"] i{background:#14100a;color:var(--gold-hi)}
+.days{padding-top:8px}
+.prox{background:var(--panel);border:1px solid var(--line);padding:14px;display:grid;gap:10px}
+.prox-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+.prox h2{font:700 1.05rem/1.2 var(--display);margin:0}
+.prox ul{list-style:none;margin:0;padding:0;display:grid;gap:6px;max-height:280px;overflow:auto}
+.prox li button{width:100%;display:grid;grid-template-columns:auto 1fr auto;gap:4px 12px;align-items:center;text-align:left;background:var(--bg);border:1px solid var(--line);color:var(--fg);padding:9px 10px;cursor:pointer;border-radius:2px;font:inherit}
+.prox li button:hover{border-color:var(--gold-lo)}
+.prox .when{font:600 .95rem/1.15 var(--label);color:var(--gold-hi);font-variant-numeric:tabular-nums;min-width:86px}
+.prox .name{font-weight:600;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.prox .name small{display:block;font-weight:400;color:var(--muted);font-size:.8rem}
+.new{font:700 .62rem/1 var(--label);letter-spacing:.14em;text-transform:uppercase;padding:4px 6px;background:var(--ok);color:#0b2e17;border-radius:2px}
+.cell .new{position:absolute;top:8px;right:8px}
+.toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:20;background:var(--gold);color:#14100a;padding:12px 16px;border-radius:2px;font:600 .95rem/1.3 var(--body);box-shadow:0 8px 24px rgba(0,0,0,.5);max-width:calc(100vw - 32px)}
+.live{display:inline-flex;align-items:center;gap:6px;font:500 .78rem var(--label);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.live::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 3px rgba(111,207,142,.2)}
+.calurl{font-size:.8rem;word-break:break-all;background:var(--bg);padding:8px;border:1px solid var(--line);user-select:all}
+ol.steps{margin:0;padding-left:18px;display:grid;gap:6px;font-size:.92rem}
 [hidden]{display:none!important}
+.cell:has(.new) .who{padding-right:58px}
+@media (max-width:560px){.bar .wrap{gap:6px}.bar img{width:30px;height:30px}.bar .grow .eyebrow{display:none}.bar h1{font-size:1.15rem}.bar .btn-sm{padding:0 7px;font-size:.66rem;letter-spacing:.05em;min-height:32px}}
 @media (max-width:420px){.grid{grid-template-columns:1fr 1fr}.cell{min-height:110px;padding:10px}.cell .time{font-size:1.3rem}}
 </style>
 </head>
@@ -88,11 +110,16 @@ dialog h3{font:700 1.2rem/1.2 var(--display);margin:0}
     <div class="wrap">
       <img src="img/logo.png" alt="">
       <div class="grow"><div class="eyebrow">The King's Barbershop</div><h1>Agenda</h1></div>
+      <button class="btn btn-sm" id="calBtn" type="button">Calendario</button>
       <button class="btn btn-sm" id="refresh" type="button">Actualizar</button>
       <button class="btn btn-sm" id="salir" type="button">Salir</button>
     </div>
   </header>
   <main class="wrap">
+    <section class="prox" aria-labelledby="proxT">
+      <div class="prox-head"><h2 id="proxT">Próximos turnos</h2><span class="live" id="live">Se actualiza solo</span></div>
+      <ul id="proxList"><li class="hint">Cargando…</li></ul>
+    </section>
     <div class="days" id="days" aria-label="Elegí el día"></div>
     <div class="summary">
       <h2 id="diaTitulo">—</h2>
@@ -100,7 +127,7 @@ dialog h3{font:700 1.2rem/1.2 var(--display);margin:0}
     </div>
     <p class="err" id="appErr" aria-live="polite"></p>
     <div class="grid" id="grid"></div>
-    <p class="hint">Tocá un horario libre para cargar un turno (alguien que llamó o vino al local) o para bloquearlo. Los horarios ocupados ya no se pueden elegir en la web.</p>
+    <p class="hint">Los turnos que se reservan en la web aparecen acá solos. Tocá un horario libre solo si querés cargar a alguien que llamó o vino al local, o para bloquear el horario.</p>
   </main>
 </div>
 
@@ -119,6 +146,24 @@ dialog h3{font:700 1.2rem/1.2 var(--display);margin:0}
       <button class="btn" id="addBlock" type="button">Bloquear horario</button>
     </div>
     <button class="btn btn-sm" id="addCancel" type="button">Cerrar</button>
+  </form>
+</dialog>
+
+<div class="toast" id="toast" hidden role="status"></div>
+
+<dialog id="calDlg">
+  <form method="dialog" style="display:grid;gap:12px">
+    <h3>Turnos en el calendario del celular</h3>
+    <p style="margin:0">Suscribite una vez y los turnos nuevos aparecen solos en tu calendario, con aviso 30 minutos antes.</p>
+    <div><div class="eyebrow" style="margin-bottom:6px">iPhone</div>
+      <ol class="steps"><li>Abrí esta página en el iPhone y tocá <b>Agregar en iPhone</b>.</li><li>Confirmá con <b>Suscribirse</b>.</li></ol>
+      <a class="btn btn-gold" id="calIos" href="#" style="margin-top:8px;width:100%">Agregar en iPhone</a></div>
+    <div><div class="eyebrow" style="margin-bottom:6px">Android / Google Calendar</div>
+      <ol class="steps"><li>Copiá el enlace de abajo.</li><li>En una computadora abrí <b>calendar.google.com</b> → <b>Otros calendarios</b> → <b>+</b> → <b>Desde URL</b>, pegalo y tocá <b>Agregar calendario</b>.</li><li>Aparece en la app del celular con la misma cuenta.</li></ol>
+      <div class="calurl" id="calUrl" style="margin-top:8px">…</div>
+      <button class="btn" id="calCopy" type="button" style="margin-top:8px;width:100%">Copiar enlace</button></div>
+    <p class="hint">iPhone actualiza cada 15 minutos aprox. Google Calendar puede tardar varias horas en mostrar un turno nuevo: para ver al instante, usá esta agenda.</p>
+    <button class="btn btn-sm" id="calClose" type="button">Cerrar</button>
   </form>
 </dialog>
 
@@ -165,6 +210,10 @@ dialog h3{font:700 1.2rem/1.2 var(--display);margin:0}
   $("salir").addEventListener("click",function(){ try{sessionStorage.removeItem(KEY)}catch(e){} location.reload(); });
 
   // --- Agenda ---
+  var todos=[], hoy="", conocidos=null, pending=0, baseTitle=document.title;
+  function key(t){ return t.fecha+" "+t.hora; }
+  function esNuevo(t){ return t.origen==="web" && t.creado && (Date.now()-Date.parse(t.creado))<24*3600e3; }
+  function nice(f){ var p=f.split("-"), d=new Date(Date.UTC(+p[0],+p[1]-1,+p[2])); return (f===hoy?"Hoy":SHORT[d.getUTCDay()])+" "+(+p[2])+"/"+(+p[1]); }
   function start(){
     $("login").hidden=true; $("app").hidden=false;
     var n=nowCba(), p=n.fecha.split("-"), dt=new Date(Date.UTC(+p[0],+p[1]-1,+p[2])), box=$("days");
@@ -176,20 +225,64 @@ dialog h3{font:700 1.2rem/1.2 var(--display);margin:0}
       b.innerHTML="<b>"+(v===n.fecha?"Hoy":SHORT[dt.getUTCDay()])+"</b><span>"+dt.getUTCDate()+"/"+(dt.getUTCMonth()+1)+"</span>";
       box.appendChild(b); c++;
     }
-    box.addEventListener("click",function(e){ var b=e.target.closest(".day"); if(b) load(b.dataset.v); });
-    load(box.firstChild.dataset.v);
-    setInterval(function(){ if(!document.hidden && !$("addDlg").open && !$("delDlg").open) load(fecha,true); },60000);
+    box.addEventListener("click",function(e){ var b=e.target.closest(".day"); if(b) select(b.dataset.v); });
+    fecha=box.firstChild.dataset.v;
+    select(fecha); load();
+    setInterval(function(){ if(!$("addDlg").open && !$("delDlg").open) load(true); },20000);
+    document.addEventListener("visibilitychange",function(){ if(!document.hidden){ pending=0; document.title=baseTitle; load(true); } });
   }
-  function load(f,quiet){
+  function select(f){
     fecha=f;
     [].forEach.call($("days").children,function(b){ b.setAttribute("aria-pressed", b.dataset.v===f); });
     var p=f.split("-"), d=new Date(Date.UTC(+p[0],+p[1]-1,+p[2]));
     $("diaTitulo").textContent=DAYS[d.getUTCDay()]+" "+(+p[2])+"/"+(+p[1]);
-    if(!quiet){ $("grid").innerHTML='<p class="hint">Cargando…</p>'; }
-    $("appErr").textContent="";
-    api({accion:"listar",fecha:f}).then(function(j){ if(f!==fecha) return; turnos=j.turnos||[]; render(); })
-      .catch(function(er){ if(er.status===401){ try{sessionStorage.removeItem(KEY)}catch(e){} location.reload(); return; } $("appErr").textContent=er.message; });
+    turnos=todos.filter(function(t){ return t.fecha===f; });
+    if (conocidos) render();
   }
+  function load(quiet){
+    if(!quiet && !conocidos){ $("grid").innerHTML='<p class="hint">Cargando…</p>'; }
+    api({accion:"proximos"}).then(function(j){
+      hoy=j.hoy; todos=j.turnos||[];
+      var nuevos=[];
+      if (conocidos){ todos.forEach(function(t){ if(!conocidos[key(t)] && t.origen==="web") nuevos.push(t); }); }
+      conocidos={}; todos.forEach(function(t){ conocidos[key(t)]=1; });
+      $("appErr").textContent="";
+      renderProx(); counts(); select(fecha);
+      if (nuevos.length){
+        var t=nuevos[0];
+        toast("Nuevo turno: "+t.nombre+" · "+nice(t.fecha)+" "+t.hora+(nuevos.length>1?" (+"+(nuevos.length-1)+" más)":""));
+        if (document.hidden){ pending+=nuevos.length; document.title="("+pending+") "+baseTitle; }
+      }
+    }).catch(function(er){
+      if(er.status===401){ try{sessionStorage.removeItem(KEY)}catch(e){} location.reload(); return; }
+      $("appErr").textContent="No se pudo actualizar: "+er.message;
+    });
+  }
+  function toast(msg){
+    var el=$("toast"); el.textContent=msg; el.hidden=false;
+    clearTimeout(toast._t); toast._t=setTimeout(function(){ el.hidden=true; },7000);
+  }
+  function counts(){
+    var c={}; todos.forEach(function(t){ if(t.servicio!=="Horario bloqueado") c[t.fecha]=(c[t.fecha]||0)+1; });
+    [].forEach.call($("days").children,function(b){
+      var i=b.querySelector("i"); if(i) i.remove();
+      if (c[b.dataset.v]){ i=document.createElement("i"); i.textContent=c[b.dataset.v]; b.appendChild(i); }
+    });
+  }
+  function renderProx(){
+    var n=nowCba(), list=todos.filter(function(t){
+      if (t.servicio==="Horario bloqueado") return false;
+      if (t.fecha===n.fecha){ var hm=t.hora.split(":"); return (+hm[0])*60+(+hm[1])+SLOT>n.mins; }
+      return true;
+    });
+    if (!list.length){ $("proxList").innerHTML='<li class="hint">Todavía no hay turnos reservados.</li>'; return; }
+    $("proxList").innerHTML=list.slice(0,40).map(function(t){
+      return '<li><button type="button" data-go="'+t.fecha+'"><span class="when">'+esc(nice(t.fecha))+'<br>'+t.hora+'</span>'+
+        '<span class="name">'+esc(t.nombre)+'<small>'+esc(String(t.servicio||"").replace(/ \(.*\)$/,""))+(t.origen==="web"?" · web":" · local")+'</small></span>'+
+        (esNuevo(t)?'<span class="new">Nuevo</span>':'<span></span>')+'</button></li>';
+    }).join("");
+  }
+  $("proxList").addEventListener("click",function(e){ var b=e.target.closest("[data-go]"); if(b){ select(b.dataset.go); $("diaTitulo").scrollIntoView({behavior:"smooth",block:"start"}); } });
   function render(){
     var n=nowCba(), grid=$("grid"), map={}, ocup=0, html="";
     turnos.forEach(function(t){ map[t.hora]=t; });
@@ -199,6 +292,7 @@ dialog h3{font:700 1.2rem/1.2 var(--display);margin:0}
         var blocked=t.servicio==="Horario bloqueado";
         if(!blocked) ocup++;
         html+='<div class="cell '+(blocked?"blocked":"busy")+(past?" past":"")+'">'+
+          (esNuevo(t)?'<span class="new">Nuevo</span>':'')+
           '<div class="who">'+esc(t.nombre)+'</div>'+
           '<div class="time">'+h+'</div>'+
           (blocked?'':'<div class="svc">'+esc(t.servicio)+'</div>')+
@@ -215,7 +309,21 @@ dialog h3{font:700 1.2rem/1.2 var(--display);margin:0}
     var libres=grid.querySelectorAll(".cell.free").length;
     $("count").innerHTML="<b>"+ocup+"</b> turno"+(ocup===1?"":"s")+" · "+libres+" libre"+(libres===1?"":"s");
   }
-  $("refresh").addEventListener("click",function(){ load(fecha); });
+  $("refresh").addEventListener("click",function(){ load(); });
+
+  // --- Calendario del celular ---
+  $("calBtn").addEventListener("click",function(){
+    $("calDlg").showModal();
+    api({accion:"calendario"}).then(function(j){
+      $("calUrl").textContent=j.url; $("calIos").href=j.url.replace(/^https:/,"webcal:");
+    }).catch(function(er){ $("calUrl").textContent=er.message; });
+  });
+  $("calClose").addEventListener("click",function(){ $("calDlg").close(); });
+  $("calCopy").addEventListener("click",function(){
+    var u=$("calUrl").textContent, b=$("calCopy");
+    function sel(){ var r=document.createRange(); r.selectNodeContents($("calUrl")); var s=getSelection(); s.removeAllRanges(); s.addRange(r); }
+    try{ navigator.clipboard.writeText(u).then(function(){ b.textContent="Copiado"; setTimeout(function(){b.textContent="Copiar enlace"},1800); },sel); }catch(e){ sel(); }
+  });
 
   // --- Cargar / bloquear ---
   $("grid").addEventListener("click",function(e){
@@ -231,8 +339,8 @@ dialog h3{font:700 1.2rem/1.2 var(--display);margin:0}
     var body={accion:"agregar",fecha:fecha,hora:slotSel,nombre:$("aNombre").value.trim(),telefono:$("aTel").value.trim(),servicio:bloquear?"bloqueado":$("aSvc").value,nota:$("aNota").value.trim()};
     if (!bloquear && !body.nombre){ $("addErr").textContent="Escribí el nombre del cliente."; $("aNombre").focus(); return; }
     $("addOk").disabled=$("addBlock").disabled=true;
-    api(body).then(function(){ $("addDlg").close(); load(fecha); })
-      .catch(function(er){ $("addErr").textContent=er.message; if(er.status===409) load(fecha,true); })
+    api(body).then(function(){ $("addDlg").close(); load(true); })
+      .catch(function(er){ $("addErr").textContent=er.message; if(er.status===409) load(true); })
       .then(function(){ $("addOk").disabled=$("addBlock").disabled=false; });
   }
   $("addOk").addEventListener("click",function(){ guardar(false); });
@@ -241,7 +349,7 @@ dialog h3{font:700 1.2rem/1.2 var(--display);margin:0}
   $("delNo").addEventListener("click",function(){ $("delDlg").close(); });
   $("delOk").addEventListener("click",function(){
     $("delOk").disabled=true;
-    api({accion:"cancelar",fecha:fecha,hora:slotSel}).then(function(){ $("delDlg").close(); load(fecha); })
+    api({accion:"cancelar",fecha:fecha,hora:slotSel}).then(function(){ $("delDlg").close(); load(true); })
       .catch(function(er){ $("delErr").textContent=er.message; })
       .then(function(){ $("delOk").disabled=false; });
   });
